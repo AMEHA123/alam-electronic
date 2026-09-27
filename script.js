@@ -1,12 +1,65 @@
-const products=[
- {id:1,name:'هاتف ذكي Pro Max',price:3499,old:3799,category:'phones',icon:'📱'},
- {id:2,name:'لابتوب أداء احترافي 15 بوصة',price:4999,category:'laptops',icon:'💻'},
- {id:3,name:'سماعات لاسلكية بعزل الضوضاء',price:399,old:499,category:'audio',icon:'🎧'},
- {id:4,name:'هاتف اقتصادي ببطارية قوية',price:899,category:'phones',icon:'📲'},
- {id:5,name:'لابتوب خفيف للدراسة والعمل',price:2799,category:'laptops',icon:'🖥️'},
- {id:6,name:'مكبر صوت محمول',price:249,category:'audio',icon:'🔊'},
- {id:7,name:'ساعة ذكية لمتابعة الصحة',price:649,category:'phones',icon:'⌚'},
- {id:8,name:'لوحة مفاتيح لاسلكية',price:189,category:'laptops',icon:'⌨️'}
+const products = [
+  {
+    id: 1,
+    name: 'Samsung Galaxy S26 Ultra',
+    price: 4499,
+    old: 4799,
+    category: 'phones',
+    icon: '📱'
+  },
+  {
+    id: 2,
+    name: 'iPhone 17 Pro',
+    price: 4699,
+    old: 4999,
+    category: 'phones',
+    icon: '📱'
+  },
+  {
+    id: 3,
+    name: 'لابتوب HP 15 للدراسة والعمل',
+    price: 2499,
+    old: 2799,
+    category: 'laptops',
+    icon: '💻'
+  },
+  {
+    id: 4,
+    name: 'لابتوب Lenovo IdeaPad',
+    price: 2299,
+    category: 'laptops',
+    icon: '🖥️'
+  },
+  {
+    id: 5,
+    name: 'سماعات بلوتوث لاسلكية',
+    price: 199,
+    old: 249,
+    category: 'audio',
+    icon: '🎧'
+  },
+  {
+    id: 6,
+    name: 'مكبر صوت بلوتوث محمول',
+    price: 159,
+    category: 'audio',
+    icon: '🔊'
+  },
+  {
+    id: 7,
+    name: 'ساعة ذكية رياضية',
+    price: 299,
+    old: 349,
+    category: 'phones',
+    icon: '⌚'
+  },
+  {
+    id: 8,
+    name: 'لوحة مفاتيح وماوس لاسلكيان',
+    price: 129,
+    category: 'laptops',
+    icon: '⌨️'
+  }
 ];
 let cart=JSON.parse(localStorage.getItem('alamCart')||'[]');let current='all';
 const grid=document.querySelector('#productsGrid'),count=document.querySelector('#cartCount'),items=document.querySelector('#cartItems'),total=document.querySelector('#cartTotal');
