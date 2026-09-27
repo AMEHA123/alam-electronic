@@ -61,15 +61,187 @@ const products = [
     icon: '⌨️'
   }
 ];
-let cart=JSON.parse(localStorage.getItem('alamCart')||'[]');let current='all';
-const grid=document.querySelector('#productsGrid'),count=document.querySelector('#cartCount'),items=document.querySelector('#cartItems'),total=document.querySelector('#cartTotal');
-const money=n=>new Intl.NumberFormat('ar-SA').format(n)+' ر.س';
-function renderProducts(){const q=document.querySelector('#searchInput').value.trim();const list=products.filter(p=>(current==='all'||p.category===current)&&p.name.includes(q));grid.innerHTML=list.map(p=>`<article class="product"><div class="product-art">${p.icon}</div><div class="product-info"><span class="badge">متوفر الآن</span><h3>${p.name}</h3><p class="price">${money(p.price)} ${p.old?`<span class="old-price">${money(p.old)}</span>`:''}</p><button class="add-btn" data-id="${p.id}">أضف إلى السلة</button></div></article>`).join('')||'<p>لا توجد منتجات مطابقة لبحثك.</p>';document.querySelectorAll('.add-btn').forEach(b=>b.onclick=()=>add(+b.dataset.id))}
-function add(id){cart.push(products.find(p=>p.id===id));save();toast('تمت إضافة المنتج إلى السلة')}
-function save(){localStorage.setItem('alamCart',JSON.stringify(cart));count.textContent=cart.length;renderCart()}
-function renderCart(){if(!cart.length){items.innerHTML='<p>السلة فارغة حاليًا.</p>';total.textContent='0 ر.س';return}items.innerHTML=cart.map((p,i)=>`<div class="cart-item"><span>${p.icon} ${p.name}<br><strong>${money(p.price)}</strong></span><button onclick="removeItem(${i})">حذف</button></div>`).join('');total.textContent=money(cart.reduce((s,p)=>s+p.price,0))}
-function removeItem(i){cart.splice(i,1);save()};window.removeItem=removeItem;
-function toast(msg){const el=document.querySelector('#toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2400)}
-document.querySelectorAll('.category-card').forEach(b=>b.onclick=()=>{current=b.dataset.filter;document.querySelectorAll('.category-card').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderProducts();document.querySelector('#products').scrollIntoView({behavior:'smooth'})});
-document.querySelector('#searchInput').oninput=renderProducts;
-const panel=document.querySelector('#cartPanel'),overlay=document.querySelector('#overlay');document.querySelector('#cartButton').onclick=()=>{panel.classList.add('open');overlay.classList.add('show')};function close(){panel.classList.remove('open');overlay.classList.remove('show')}document.querySelector('#closeCart').onclick=close;overlay.onclick=close;document.querySelector('#menuToggle').onclick=()=>document.querySelector('#navLinks').classList.toggle('open');document.querySelector('#subscribeForm').onsubmit=e=>{e.preventDefault();e.target.reset();toast('تم الاشتراك بنجاح — شكرًا لك!')};document.querySelector('#checkout').onclick=()=>toast(cart.length?'هذه نسخة تجريبية: أضف بوابة دفع لإتمام الطلبات.':'أضف منتجًا إلى السلة أولًا.');renderProducts();save();
+
+let cart = JSON.parse(localStorage.getItem('alamCart') || '[]');
+let currentCategory = 'all';
+
+const grid = document.querySelector('#productsGrid');
+const count = document.querySelector('#cartCount');
+const items = document.querySelector('#cartItems');
+const total = document.querySelector('#cartTotal');
+
+function formatPrice(price) {
+  return new Intl.NumberFormat('ar-SA').format(price) + ' ر.س';
+}
+
+function renderProducts() {
+  const searchBox = document.querySelector('#searchInput');
+  const query = searchBox ? searchBox.value.trim() : '';
+
+  const visibleProducts = products.filter(function (product) {
+    const categoryMatches =
+      currentCategory === 'all' || product.category === currentCategory;
+
+    const searchMatches = product.name.includes(query);
+
+    return categoryMatches && searchMatches;
+  });
+
+  if (visibleProducts.length === 0) {
+    grid.innerHTML = '<p>لا توجد منتجات مطابقة لبحثك.</p>';
+    return;
+  }
+
+  grid.innerHTML = visibleProducts.map(function (product) {
+    const oldPrice = product.old
+      ? '<span class="old-price">' + formatPrice(product.old) + '</span>'
+      : '';
+
+    return `
+      <article class="product">
+        <div class="product-art">${product.icon}</div>
+        <div class="product-info">
+          <span class="badge">متوفر الآن</span>
+          <h3>${product.name}</h3>
+          <p class="price">
+            ${formatPrice(product.price)}
+            ${oldPrice}
+          </p>
+          <button class="add-btn" data-id="${product.id}">
+            أضف إلى السلة
+          </button>
+        </div>
+      </article>
+    `;
+  }).join('');
+
+  document.querySelectorAll('.add-btn').forEach(function (button) {
+    button.addEventListener('click', function () {
+      addToCart(Number(button.dataset.id));
+    });
+  });
+}
+
+function addToCart(id) {
+  const product = products.find(function (item) {
+    return item.id === id;
+  });
+
+  if (!product) return;
+
+  cart.push(product);
+  saveCart();
+  showToast('تمت إضافة المنتج إلى السلة');
+}
+
+function saveCart() {
+  localStorage.setItem('alamCart', JSON.stringify(cart));
+  count.textContent = cart.length;
+  renderCart();
+}
+
+function renderCart() {
+  if (cart.length === 0) {
+    items.innerHTML = '<p>السلة فارغة حاليًا.</p>';
+    total.textContent = '0 ر.س';
+    return;
+  }
+
+  items.innerHTML = cart.map(function (product, index) {
+    return `
+      <div class="cart-item">
+        <span>
+          ${product.icon} ${product.name}
+          <br>
+          <strong>${formatPrice(product.price)}</strong>
+        </span>
+        <button onclick="removeItem(${index})">حذف</button>
+      </div>
+    `;
+  }).join('');
+
+  const fullTotal = cart.reduce(function (sum, product) {
+    return sum + product.price;
+  }, 0);
+
+  total.textContent = formatPrice(fullTotal);
+}
+
+function removeItem(index) {
+  cart.splice(index, 1);
+  saveCart();
+}
+
+window.removeItem = removeItem;
+
+function showToast(message) {
+  const toast = document.querySelector('#toast');
+
+  if (!toast) {
+    alert(message);
+    return;
+  }
+
+  toast.textContent = message;
+  toast.classList.add('show');
+
+  setTimeout(function () {
+    toast.classList.remove('show');
+  }, 2400);
+}
+
+document.querySelectorAll('.category-card').forEach(function (button) {
+  button.addEventListener('click', function () {
+    currentCategory = button.dataset.filter;
+
+    document.querySelectorAll('.category-card').forEach(function (card) {
+      card.classList.remove('active');
+    });
+
+    button.classList.add('active');
+    renderProducts();
+
+    document.querySelector('#products').scrollIntoView({
+      behavior: 'smooth'
+    });
+  });
+});
+
+document.querySelector('#searchInput').addEventListener('input', renderProducts);
+
+const panel = document.querySelector('#cartPanel');
+const overlay = document.querySelector('#overlay');
+
+document.querySelector('#cartButton').addEventListener('click', function () {
+  panel.classList.add('open');
+  overlay.classList.add('show');
+});
+
+function closeCart() {
+  panel.classList.remove('open');
+  overlay.classList.remove('show');
+}
+
+document.querySelector('#closeCart').addEventListener('click', closeCart);
+overlay.addEventListener('click', closeCart);
+
+document.querySelector('#menuToggle').addEventListener('click', function () {
+  document.querySelector('#navLinks').classList.toggle('open');
+});
+
+document.querySelector('#subscribeForm').addEventListener('submit', function (event) {
+  event.preventDefault();
+  event.target.reset();
+  showToast('تم الاشتراك بنجاح — شكرًا لك!');
+});
+
+document.querySelector('#checkout').addEventListener('click', function () {
+  if (cart.length === 0) {
+    showToast('أضف منتجًا إلى السلة أولًا.');
+  } else {
+    showToast('هذه نسخة تجريبية: أضف بوابة دفع لإتمام الطلبات.');
+  }
+});
+
+renderProducts();
+saveCart();
