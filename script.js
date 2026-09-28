@@ -251,5 +251,12 @@ document.querySelector('#checkout').addEventListener('click', function () {
   }
 });
 
+.product-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  border-radius: inherit;
+}
 renderProducts();
 saveCart();
