@@ -245,3 +245,4 @@ document.querySelector('#checkout').addEventListener('click', function () {
 
 renderProducts();
 saveCart();
+renderProducts();
