@@ -1,3 +1,4 @@
+
 const products = [
   {
     id: 1,
@@ -5,7 +6,8 @@ const products = [
     price: 4499,
     old: 4799,
     category: 'phones',
-    icon: '📱'
+    icon: '📱',
+    image: 'images/galaxy-s26-ultra.jpg'
   },
   {
     id: 2,
@@ -99,7 +101,13 @@ function renderProducts() {
 
     return `
       <article class="product">
-        <div class="product-art">${product.icon}</div>
+        <div class="product-art">
+          ${
+            product.image
+              ? `<img src="${product.image}" alt="${product.name}">`
+              : product.icon
+          }
+        </div>
         <div class="product-info">
           <span class="badge">متوفر الآن</span>
           <h3>${product.name}</h3>
@@ -245,4 +253,3 @@ document.querySelector('#checkout').addEventListener('click', function () {
 
 renderProducts();
 saveCart();
-renderProducts();
