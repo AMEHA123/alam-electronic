@@ -1,4 +1,3 @@
-
 const products = [
   {
     id: 1,
@@ -77,37 +76,31 @@ function formatPrice(price) {
 }
 
 function renderProducts() {
-  const searchBox = document.querySelector('#searchInput');
-  const query = searchBox ? searchBox.value.trim() : '';
+  const searchInput = document.querySelector('#searchInput');
+  const query = searchInput ? searchInput.value.trim() : '';
 
   const visibleProducts = products.filter(function (product) {
-    const categoryMatches =
-      currentCategory === 'all' || product.category === currentCategory;
+    const matchesCategory =
+      currentCategory === 'all' ||
+      product.category === currentCategory;
 
-    const searchMatches = product.name.includes(query);
-
-    return categoryMatches && searchMatches;
+    return matchesCategory && product.name.includes(query);
   });
 
-  if (visibleProducts.length === 0) {
-    grid.innerHTML = '<p>لا توجد منتجات مطابقة لبحثك.</p>';
-    return;
-  }
+  if (!grid) return;
 
   grid.innerHTML = visibleProducts.map(function (product) {
     const oldPrice = product.old
       ? '<span class="old-price">' + formatPrice(product.old) + '</span>'
       : '';
 
+    const visual = product.image
+      ? '<img src="' + product.image + '" alt="' + product.name + '">'
+      : product.icon;
+
     return `
       <article class="product">
-        <div class="product-art">
-          ${
-            product.image
-              ? `<img src="${product.image}" alt="${product.name}">`
-              : product.icon
-          }
-        </div>
+        <div class="product-art">${visual}</div>
         <div class="product-info">
           <span class="badge">متوفر الآن</span>
           <h3>${product.name}</h3>
@@ -144,11 +137,17 @@ function addToCart(id) {
 
 function saveCart() {
   localStorage.setItem('alamCart', JSON.stringify(cart));
-  count.textContent = cart.length;
+
+  if (count) {
+    count.textContent = cart.length;
+  }
+
   renderCart();
 }
 
 function renderCart() {
+  if (!items || !total) return;
+
   if (cart.length === 0) {
     items.innerHTML = '<p>السلة فارغة حاليًا.</p>';
     total.textContent = '0 ر.س';
@@ -209,54 +208,77 @@ document.querySelectorAll('.category-card').forEach(function (button) {
     button.classList.add('active');
     renderProducts();
 
-    document.querySelector('#products').scrollIntoView({
-      behavior: 'smooth'
-    });
+    const productsSection = document.querySelector('#products');
+
+    if (productsSection) {
+      productsSection.scrollIntoView({
+        behavior: 'smooth'
+      });
+    }
   });
 });
 
-document.querySelector('#searchInput').addEventListener('input', renderProducts);
+const searchInput = document.querySelector('#searchInput');
+
+if (searchInput) {
+  searchInput.addEventListener('input', renderProducts);
+}
 
 const panel = document.querySelector('#cartPanel');
 const overlay = document.querySelector('#overlay');
+const cartButton = document.querySelector('#cartButton');
+const closeCartButton = document.querySelector('#closeCart');
 
-document.querySelector('#cartButton').addEventListener('click', function () {
-  panel.classList.add('open');
-  overlay.classList.add('show');
-});
+if (cartButton) {
+  cartButton.addEventListener('click', function () {
+    panel.classList.add('open');
+    overlay.classList.add('show');
+  });
+}
 
 function closeCart() {
-  panel.classList.remove('open');
-  overlay.classList.remove('show');
+  if (panel) panel.classList.remove('open');
+  if (overlay) overlay.classList.remove('show');
 }
 
-document.querySelector('#closeCart').addEventListener('click', closeCart);
-overlay.addEventListener('click', closeCart);
-
-document.querySelector('#menuToggle').addEventListener('click', function () {
-  document.querySelector('#navLinks').classList.toggle('open');
-});
-
-document.querySelector('#subscribeForm').addEventListener('submit', function (event) {
-  event.preventDefault();
-  event.target.reset();
-  showToast('تم الاشتراك بنجاح — شكرًا لك!');
-});
-
-document.querySelector('#checkout').addEventListener('click', function () {
-  if (cart.length === 0) {
-    showToast('أضف منتجًا إلى السلة أولًا.');
-  } else {
-    showToast('هذه نسخة تجريبية: أضف بوابة دفع لإتمام الطلبات.');
-  }
-});
-
-.product-art img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: block;
-  border-radius: inherit;
+if (closeCartButton) {
+  closeCartButton.addEventListener('click', closeCart);
 }
+
+if (overlay) {
+  overlay.addEventListener('click', closeCart);
+}
+
+const menuToggle = document.querySelector('#menuToggle');
+const navLinks = document.querySelector('#navLinks');
+
+if (menuToggle && navLinks) {
+  menuToggle.addEventListener('click', function () {
+    navLinks.classList.toggle('open');
+  });
+}
+
+const subscribeForm = document.querySelector('#subscribeForm');
+
+if (subscribeForm) {
+  subscribeForm.addEventListener('submit', function (event) {
+    event.preventDefault();
+    event.target.reset();
+    showToast('تم الاشتراك بنجاح — شكرًا لك!');
+  });
+}
+
+const checkout = document.querySelector('#checkout');
+
+if (checkout) {
+  checkout.addEventListener('click', function () {
+    if (cart.length === 0) {
+      showToast('أضف منتجًا إلى السلة أولًا.');
+    } else {
+      showToast('هذه نسخة تجريبية: أضف بوابة دفع لإتمام الطلبات.');
+    }
+  });
+}
+
 renderProducts();
 saveCart();
