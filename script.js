@@ -1,284 +1,218 @@
-const products = [
-  {
-    id: 1,
-    name: 'Samsung Galaxy S26 Ultra',
-    price: 4499,
-    old: 4799,
-    category: 'phones',
-    icon: '📱',
-    image: 'images/galaxy-s26-ultra.jpg'
-  },
-  {
-    id: 2,
-    name: 'iPhone 17 Pro',
-    price: 4699,
-    old: 4999,
-    category: 'phones',
-    icon: '📱'
-  },
-  {
-    id: 3,
-    name: 'لابتوب HP 15 للدراسة والعمل',
-    price: 2499,
-    old: 2799,
-    category: 'laptops',
-    icon: '💻'
-  },
-  {
-    id: 4,
-    name: 'لابتوب Lenovo IdeaPad',
-    price: 2299,
-    category: 'laptops',
-    icon: '🖥️'
-  },
-  {
-    id: 5,
-    name: 'سماعات بلوتوث لاسلكية',
-    price: 199,
-    old: 249,
-    category: 'audio',
-    icon: '🎧'
-  },
-  {
-    id: 6,
-    name: 'مكبر صوت بلوتوث محمول',
-    price: 159,
-    category: 'audio',
-    icon: '🔊'
-  },
-  {
-    id: 7,
-    name: 'ساعة ذكية رياضية',
-    price: 299,
-    old: 349,
-    category: 'phones',
-    icon: '⌚'
-  },
-  {
-    id: 8,
-    name: 'لوحة مفاتيح وماوس لاسلكيان',
-    price: 129,
-    category: 'laptops',
-    icon: '⌨️'
-  }
-];
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="عالم إلكترونيك - متجر عربي تجريبي للأجهزة والإكسسوارات" />
+    <title>عالم إلكترونيك | متجر التقنية</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="announcement">🚚 شحن مجاني للطلبات فوق 500 ر.س — هذا متجر تجريبي</div>
 
-let cart = JSON.parse(localStorage.getItem('alamCart') || '[]');
-let currentCategory = 'all';
+    <header class="header">
+      <div class="container nav">
+        <a class="brand" href="#home">عالم <span>إلكترونيك</span></a>
 
-const grid = document.querySelector('#productsGrid');
-const count = document.querySelector('#cartCount');
-const items = document.querySelector('#cartItems');
-const total = document.querySelector('#cartTotal');
+        <button class="menu-toggle" id="menuToggle" aria-label="فتح القائمة">☰</button>
 
-function formatPrice(price) {
-  return new Intl.NumberFormat('ar-SA').format(price) + ' ر.س';
-}
+        <nav id="navLinks">
+          <a href="#home">الرئيسية</a>
+          <a href="#categories">الأقسام</a>
+          <a href="#products">المنتجات</a>
+          <a href="#articles">المقالات</a>
+          <a href="#contact">تواصل</a>
+        </nav>
 
-function renderProducts() {
-  const searchInput = document.querySelector('#searchInput');
-  const query = searchInput ? searchInput.value.trim() : '';
-
-  const visibleProducts = products.filter(function (product) {
-    const matchesCategory =
-      currentCategory === 'all' ||
-      product.category === currentCategory;
-
-    return matchesCategory && product.name.includes(query);
-  });
-
-  if (!grid) return;
-
-  grid.innerHTML = visibleProducts.map(function (product) {
-    const oldPrice = product.old
-      ? '<span class="old-price">' + formatPrice(product.old) + '</span>'
-      : '';
-
-    const visual = product.image
-      ? '<img src="' + product.image + '" alt="' + product.name + '">'
-      : product.icon;
-
-    return `
-      <article class="product">
-        <div class="product-art">${visual}</div>
-        <div class="product-info">
-          <span class="badge">متوفر الآن</span>
-          <h3>${product.name}</h3>
-          <p class="price">
-            ${formatPrice(product.price)}
-            ${oldPrice}
-          </p>
-          <button class="add-btn" data-id="${product.id}">
-            أضف إلى السلة
+        <div class="header-actions">
+          <div class="lang-switch" aria-label="Language switcher">
+            <button class="lang-btn active" data-lang="ar">AR</button>
+            <button class="lang-btn" data-lang="en">EN</button>
+          </div>
+          <button class="cart-button" id="cartButton" aria-label="فتح السلة">
+            🛒 <span id="cartCount">0</span>
           </button>
         </div>
-      </article>
-    `;
-  }).join('');
-
-  document.querySelectorAll('.add-btn').forEach(function (button) {
-    button.addEventListener('click', function () {
-      addToCart(Number(button.dataset.id));
-    });
-  });
-}
-
-function addToCart(id) {
-  const product = products.find(function (item) {
-    return item.id === id;
-  });
-
-  if (!product) return;
-
-  cart.push(product);
-  saveCart();
-  showToast('تمت إضافة المنتج إلى السلة');
-}
-
-function saveCart() {
-  localStorage.setItem('alamCart', JSON.stringify(cart));
-
-  if (count) {
-    count.textContent = cart.length;
-  }
-
-  renderCart();
-}
-
-function renderCart() {
-  if (!items || !total) return;
-
-  if (cart.length === 0) {
-    items.innerHTML = '<p>السلة فارغة حاليًا.</p>';
-    total.textContent = '0 ر.س';
-    return;
-  }
-
-  items.innerHTML = cart.map(function (product, index) {
-    return `
-      <div class="cart-item">
-        <span>
-          ${product.icon} ${product.name}
-          <br>
-          <strong>${formatPrice(product.price)}</strong>
-        </span>
-        <button onclick="removeItem(${index})">حذف</button>
       </div>
-    `;
-  }).join('');
+    </header>
 
-  const fullTotal = cart.reduce(function (sum, product) {
-    return sum + product.price;
-  }, 0);
+    <main id="home">
+      <section class="hero">
+        <div class="container hero-grid">
+          <div>
+            <p class="eyebrow">تقنية أفضل، اختيار أذكى</p>
+            <h1>كل ما تحتاجه من عالم الإلكترونيات</h1>
+            <p class="hero-text">
+              اكتشف أحدث الهواتف واللابتوبات والصوتيات والإكسسوارات في واجهة عربية سريعة وسهلة الاستخدام.
+            </p>
+            <div class="hero-actions">
+              <a class="primary-btn" href="#products">تسوّق الآن</a>
+              <a class="secondary-btn" href="#articles">اقرأ المراجعات</a>
+            </div>
+            <div class="hero-stats">
+              <div><strong>+25K</strong><span>عميل</span></div>
+              <div><strong>4.9/5</strong><span>تقييم</span></div>
+              <div><strong>24/7</strong><span>دعم</span></div>
+            </div>
+          </div>
 
-  total.textContent = formatPrice(fullTotal);
-}
+          <div class="hero-visual" aria-hidden="true">
+            <span>📱</span>
+            <span>💻</span>
+            <span>🎧</span>
+            <span>⌚</span>
+          </div>
+        </div>
+      </section>
 
-function removeItem(index) {
-  cart.splice(index, 1);
-  saveCart();
-}
+      <section class="section" id="categories">
+        <div class="container">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">تصفّح بسهولة</p>
+              <h2>تسوّق حسب القسم</h2>
+            </div>
+          </div>
 
-window.removeItem = removeItem;
+          <div class="categories">
+            <button class="category-card active" data-filter="all">✨<strong>كل المنتجات</strong><small>جميع العروض</small></button>
+            <button class="category-card" data-filter="phones">📱<strong>الهواتف</strong><small>أجهزة ذكية</small></button>
+            <button class="category-card" data-filter="laptops">💻<strong>اللابتوبات</strong><small>عمل ودراسة</small></button>
+            <button class="category-card" data-filter="audio">🎧<strong>الصوتيات</strong><small>سماعات ومكبرات</small></button>
+          </div>
+        </div>
+      </section>
 
-function showToast(message) {
-  const toast = document.querySelector('#toast');
+      <section class="section products-section" id="products">
+        <div class="container">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">منتجات مختارة</p>
+              <h2>الأكثر طلبًا</h2>
+            </div>
 
-  if (!toast) {
-    alert(message);
-    return;
-  }
+            <label class="search">
+              <span>⌕</span>
+              <input id="searchInput" type="search" placeholder="ابحث عن منتج..." />
+            </label>
+          </div>
 
-  toast.textContent = message;
-  toast.classList.add('show');
+          <div class="products" id="productsGrid"></div>
+        </div>
+      </section>
 
-  setTimeout(function () {
-    toast.classList.remove('show');
-  }, 2400);
-}
+      <section class="trust">
+        <div class="container trust-grid">
+          <div>🔒<strong>دفع آمن</strong><span>بوابات دفع موثوقة</span></div>
+          <div>🚚<strong>توصيل سريع</strong><span>خدمة خلال 48 ساعة</span></div>
+          <div>💬<strong>دعم متواصل</strong><span>فريق جاهز للإجابة</span></div>
+          <div>↩️<strong>استرجاع سهل</strong><span>سياسة واضحة ومريحة</span></div>
+        </div>
+      </section>
 
-document.querySelectorAll('.category-card').forEach(function (button) {
-  button.addEventListener('click', function () {
-    currentCategory = button.dataset.filter;
+      <section class="section" id="articles">
+        <div class="container">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">محتوى تقني</p>
+              <h2>أحدث المقالات</h2>
+            </div>
+          </div>
 
-    document.querySelectorAll('.category-card').forEach(function (card) {
-      card.classList.remove('active');
-    });
+          <div class="articles">
+            <article>
+              <div class="article-art">📸</div>
+              <div>
+                <small>دليل شراء</small>
+                <h3>كيف تختار هاتفًا بكاميرا ممتازة؟</h3>
+                <p>تعرف على العوامل المهمة قبل شراء هاتف ذكي جديد، خاصة إن كنت تركز على جودة التصوير.</p>
+              </div>
+            </article>
 
-    button.classList.add('active');
-    renderProducts();
+            <article>
+              <div class="article-art">💡</div>
+              <div>
+                <small>تجربة مستخدم</small>
+                <h3>أفضل لابتوب للعمل من المنزل</h3>
+                <p>مقارنة بين الأداء والراحة والبطارية والجودة عند اختيار جهاز مناسب لبيئة العمل.</p>
+              </div>
+            </article>
 
-    const productsSection = document.querySelector('#products');
+            <article>
+              <div class="article-art">🎧</div>
+              <div>
+                <small>مراجعات</small>
+                <h3>ماذا تختار: سماعات لاسلكية أم سلكية؟</h3>
+                <p>نقارن بين الراحة، جودة الصوت، البطارية، وسهولة الاستخدام لتختار الأنسب لك.</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
 
-    if (productsSection) {
-      productsSection.scrollIntoView({
-        behavior: 'smooth'
-      });
-    }
-  });
-});
+      <section class="section" id="contact">
+        <div class="container newsletter">
+          <div>
+            <p class="eyebrow">ابقَ على اطلاع</p>
+            <h2>اشترك في نشرتنا التقنية</h2>
+            <p>احصل على أحدث العروض، مراجعات المنتجات، وفيديوهات الاختبارات أولًا.</p>
+          </div>
 
-const searchInput = document.querySelector('#searchInput');
+          <form id="subscribeForm">
+            <input type="email" placeholder="البريد الإلكتروني" aria-label="البريد الإلكتروني" required />
+            <button type="submit" class="primary-btn">اشتراك</button>
+          </form>
+        </div>
+      </section>
+    </main>
 
-if (searchInput) {
-  searchInput.addEventListener('input', renderProducts);
-}
+    <aside class="cart-panel" id="cartPanel" aria-label="سلة التسوق">
+      <div class="cart-head">
+        <h2>سلة التسوق</h2>
+        <button id="closeCart" aria-label="إغلاق السلة">×</button>
+      </div>
 
-const panel = document.querySelector('#cartPanel');
-const overlay = document.querySelector('#overlay');
-const cartButton = document.querySelector('#cartButton');
-const closeCartButton = document.querySelector('#closeCart');
+      <div id="cartItems"></div>
 
-if (cartButton) {
-  cartButton.addEventListener('click', function () {
-    panel.classList.add('open');
-    overlay.classList.add('show');
-  });
-}
+      <div class="cart-footer">
+        <div>
+          <span>الإجمالي</span>
+          <strong id="cartTotal">0 ر.س</strong>
+        </div>
+        <button id="checkout" class="primary-btn">إتمام الطلب</button>
+      </div>
+    </aside>
 
-function closeCart() {
-  if (panel) panel.classList.remove('open');
-  if (overlay) overlay.classList.remove('show');
-}
+    <div id="overlay" aria-hidden="true"></div>
+    <div class="toast" id="toast"></div>
 
-if (closeCartButton) {
-  closeCartButton.addEventListener('click', closeCart);
-}
+    <footer>
+      <div class="container footer-grid">
+        <div>
+          <a class="brand" href="#home">عالم <span>إلكترونيك</span></a>
+          <p>مشروع متجر إلكتروني عربي تجريبي، جاهز للتطوير والتسويق.</p>
+        </div>
 
-if (overlay) {
-  overlay.addEventListener('click', closeCart);
-}
+        <div>
+          <h3>روابط سريعة</h3>
+          <ul>
+            <li><a href="#products">المنتجات</a></li>
+            <li><a href="#categories">الأقسام</a></li>
+            <li><a href="#contact">التواصل</a></li>
+          </ul>
+        </div>
 
-const menuToggle = document.querySelector('#menuToggle');
-const navLinks = document.querySelector('#navLinks');
+        <div>
+          <h3>تواصل معنا</h3>
+          <ul>
+            <li>support@alamelectronic.com</li>
+            <li>+966 11 000 0000</li>
+            <li>الرياض — السعودية</li>
+          </ul>
+        </div>
+      </div>
+    </footer>
 
-if (menuToggle && navLinks) {
-  menuToggle.addEventListener('click', function () {
-    navLinks.classList.toggle('open');
-  });
-}
-
-const subscribeForm = document.querySelector('#subscribeForm');
-
-if (subscribeForm) {
-  subscribeForm.addEventListener('submit', function (event) {
-    event.preventDefault();
-    event.target.reset();
-    showToast('تم الاشتراك بنجاح — شكرًا لك!');
-  });
-}
-
-const checkout = document.querySelector('#checkout');
-
-if (checkout) {
-  checkout.addEventListener('click', function () {
-    if (cart.length === 0) {
-      showToast('أضف منتجًا إلى السلة أولًا.');
-    } else {
-      showToast('هذه نسخة تجريبية: أضف بوابة دفع لإتمام الطلبات.');
-    }
-  });
-}
-
-renderProducts();
-saveCart();
+    <script src="script.js"></script>
+  </body>
+</html>
