@@ -1,218 +1,609 @@
-<!doctype html>
-<html lang="ar" dir="rtl">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="عالم إلكترونيك - متجر عربي تجريبي للأجهزة والإكسسوارات" />
-    <title>عالم إلكترونيك | متجر التقنية</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <div class="announcement">🚚 شحن مجاني للطلبات فوق 500 ر.س — هذا متجر تجريبي</div>
 
-    <header class="header">
-      <div class="container nav">
-        <a class="brand" href="#home">عالم <span>إلكترونيك</span></a>
+// ================================
+// عالم إلكترونيك - JavaScript
+// ================================
 
-        <button class="menu-toggle" id="menuToggle" aria-label="فتح القائمة">☰</button>
+const products = [
+  {
+    id: 1,
+    name: "Galaxy S26 Ultra",
+    category: "phones",
+    categoryName: "هواتف",
+    price: 499900,
+    description: "هاتف قوي بكاميرا متقدمة وشاشة عالية الدقة.",
+    image: "https://d2u1z1lopyfwlx.cloudfront.net/thumbnails/1279fb2a-1c4b-5ca4-ac0d-9f370abd5b24/4cbaa4b4-65d2-5a5f-bfb2-2f048ee18613.jpg"
+  },
+  {
+    id: 2,
+    name: "iPhone 17 Pro Max",
+    category: "phones",
+    categoryName: "هواتف",
+    price: 549900,
+    description: "هاتف متطور بأداء قوي وتجربة تصوير مميزة.",
+    emoji: "📱"
+  },
+  {
+    id: 3,
+    name: "Redmi Note",
+    category: "phones",
+    categoryName: "هواتف",
+    price: 89900,
+    description: "هاتف عملي مناسب للاستخدام اليومي.",
+    emoji: "📱"
+  },
+  {
+    id: 4,
+    name: "لابتوب للعمل والدراسة",
+    category: "laptops",
+    categoryName: "لابتوبات",
+    price: 329900,
+    description: "أداء ممتاز وبطارية مناسبة للعمل والدراسة.",
+    emoji: "💻"
+  },
+  {
+    id: 5,
+    name: "MacBook",
+    category: "laptops",
+    categoryName: "لابتوبات",
+    price: 499900,
+    description: "لابتوب أنيق للأعمال والإبداع والدراسة.",
+    emoji: "💻"
+  },
+  {
+    id: 6,
+    name: "سماعات لاسلكية",
+    category: "audio",
+    categoryName: "صوتيات",
+    price: 39900,
+    description: "صوت نقي وبطارية تدوم طوال اليوم.",
+    emoji: "🎧"
+  },
+  {
+    id: 7,
+    name: "سماعة Bluetooth",
+    category: "audio",
+    categoryName: "صوتيات",
+    price: 24900,
+    description: "سماعة محمولة بصوت واضح وتصميم عملي.",
+    emoji: "🔊"
+  },
+  {
+    id: 8,
+    name: "شاحن سريع USB-C",
+    category: "accessories",
+    categoryName: "إكسسوارات",
+    price: 7500,
+    description: "شاحن سريع للأجهزة الحديثة.",
+    emoji: "🔌"
+  },
+  {
+    id: 9,
+    name: "كابل USB-C",
+    category: "accessories",
+    categoryName: "إكسسوارات",
+    price: 2500,
+    description: "كابل عملي للشحن ونقل البيانات.",
+    emoji: "🔗"
+  },
+  {
+    id: 10,
+    name: "ساعة ذكية",
+    category: "watches",
+    categoryName: "ساعات",
+    price: 45900,
+    description: "ساعة ذكية لمتابعة الإشعارات والنشاط اليومي.",
+    emoji: "⌚"
+  }
+];
 
-        <nav id="navLinks">
-          <a href="#home">الرئيسية</a>
-          <a href="#categories">الأقسام</a>
-          <a href="#products">المنتجات</a>
-          <a href="#articles">المقالات</a>
-          <a href="#contact">تواصل</a>
-        </nav>
+let cart = JSON.parse(localStorage.getItem("alamElectronicCart")) || [];
 
-        <div class="header-actions">
-          <div class="lang-switch" aria-label="Language switcher">
-            <button class="lang-btn active" data-lang="ar">AR</button>
-            <button class="lang-btn" data-lang="en">EN</button>
-          </div>
-          <button class="cart-button" id="cartButton" aria-label="فتح السلة">
-            🛒 <span id="cartCount">0</span>
+let currentCategory = "all";
+
+const productsContainer =
+  document.getElementById("productsContainer");
+
+const searchInput =
+  document.getElementById("searchInput");
+
+const noResults =
+  document.getElementById("noResults");
+
+const cartPanel =
+  document.getElementById("cartPanel");
+
+const overlay =
+  document.getElementById("overlay");
+
+const cartItems =
+  document.getElementById("cartItems");
+
+const cartCount =
+  document.getElementById("cartCount");
+
+const cartTotal =
+  document.getElementById("cartTotal");
+
+const emptyCart =
+  document.getElementById("emptyCart");
+
+const checkout =
+  document.getElementById("checkout");
+
+
+// ================================
+// تنسيق السعر
+// ================================
+
+function formatPrice(price) {
+  return new Intl.NumberFormat("ar-DZ").format(price) + " دج";
+}
+
+
+// ================================
+// عرض المنتجات
+// ================================
+
+function renderProducts() {
+
+  const searchValue =
+    searchInput.value.trim().toLowerCase();
+
+  const filteredProducts = products.filter(product => {
+
+    const matchesCategory =
+      currentCategory === "all" ||
+      product.category === currentCategory;
+
+    const matchesSearch =
+      product.name.toLowerCase().includes(searchValue) ||
+      product.description.toLowerCase().includes(searchValue) ||
+      product.categoryName.toLowerCase().includes(searchValue);
+
+    return matchesCategory && matchesSearch;
+  });
+
+  productsContainer.innerHTML = "";
+
+  if (filteredProducts.length === 0) {
+    noResults.style.display = "block";
+    return;
+  }
+
+  noResults.style.display = "none";
+
+  filteredProducts.forEach(product => {
+
+    const card = document.createElement("article");
+
+    card.className = "product-card";
+
+    let productImage = "";
+
+    if (product.image) {
+
+      productImage = `
+        <img
+          src="${product.image}"
+          alt="${product.name}"
+          loading="lazy"
+        >
+      `;
+
+    } else {
+
+      productImage = `
+        <span class="product-emoji">
+          ${product.emoji}
+        </span>
+      `;
+    }
+
+    card.innerHTML = `
+      <div class="product-art">
+        ${productImage}
+      </div>
+
+      <div class="product-info">
+
+        <small>${product.categoryName}</small>
+
+        <h3>${product.name}</h3>
+
+        <p>${product.description}</p>
+
+        <div class="product-bottom">
+
+          <span class="price">
+            ${formatPrice(product.price)}
+          </span>
+
+          <button
+            class="add-button"
+            data-id="${product.id}"
+          >
+            أضف للسلة
           </button>
+
         </div>
+
       </div>
-    </header>
+    `;
 
-    <main id="home">
-      <section class="hero">
-        <div class="container hero-grid">
-          <div>
-            <p class="eyebrow">تقنية أفضل، اختيار أذكى</p>
-            <h1>كل ما تحتاجه من عالم الإلكترونيات</h1>
-            <p class="hero-text">
-              اكتشف أحدث الهواتف واللابتوبات والصوتيات والإكسسوارات في واجهة عربية سريعة وسهلة الاستخدام.
-            </p>
-            <div class="hero-actions">
-              <a class="primary-btn" href="#products">تسوّق الآن</a>
-              <a class="secondary-btn" href="#articles">اقرأ المراجعات</a>
-            </div>
-            <div class="hero-stats">
-              <div><strong>+25K</strong><span>عميل</span></div>
-              <div><strong>4.9/5</strong><span>تقييم</span></div>
-              <div><strong>24/7</strong><span>دعم</span></div>
-            </div>
-          </div>
+    productsContainer.appendChild(card);
+  });
 
-          <div class="hero-visual" aria-hidden="true">
-            <span>📱</span>
-            <span>💻</span>
-            <span>🎧</span>
-            <span>⌚</span>
-          </div>
+  document.querySelectorAll(".add-button").forEach(button => {
+
+    button.addEventListener("click", () => {
+
+      const id = Number(button.dataset.id);
+
+      addToCart(id);
+
+    });
+
+  });
+}
+
+
+// ================================
+// إضافة منتج للسلة
+// ================================
+
+function addToCart(productId) {
+
+  const existingItem =
+    cart.find(item => item.id === productId);
+
+  if (existingItem) {
+
+    existingItem.quantity += 1;
+
+  } else {
+
+    cart.push({
+      id: productId,
+      quantity: 1
+    });
+  }
+
+  saveCart();
+
+  renderCart();
+
+  openCart();
+
+}
+
+
+// ================================
+// حفظ السلة
+// ================================
+
+function saveCart() {
+
+  localStorage.setItem(
+    "alamElectronicCart",
+    JSON.stringify(cart)
+  );
+}
+
+
+// ================================
+// عرض السلة
+// ================================
+
+function renderCart() {
+
+  cartItems.innerHTML = "";
+
+  let total = 0;
+
+  let totalQuantity = 0;
+
+  if (cart.length === 0) {
+
+    emptyCart.style.display = "block";
+
+    cartTotal.textContent = "0 دج";
+
+    cartCount.textContent = "0";
+
+    checkout.disabled = true;
+
+    checkout.style.opacity = "0.5";
+
+    return;
+  }
+
+  emptyCart.style.display = "none";
+
+  checkout.disabled = false;
+
+  checkout.style.opacity = "1";
+
+  cart.forEach(item => {
+
+    const product =
+      products.find(product => product.id === item.id);
+
+    if (!product) return;
+
+    const itemTotal =
+      product.price * item.quantity;
+
+    total += itemTotal;
+
+    totalQuantity += item.quantity;
+
+    const div =
+      document.createElement("div");
+
+    div.className = "cart-item";
+
+    div.innerHTML = `
+
+      <div class="cart-item-info">
+
+        <strong>
+          ${product.name}
+        </strong>
+
+        <small>
+          ${formatPrice(product.price)}
+        </small>
+
+        <div class="cart-quantity">
+
+          <button
+            class="quantity-button"
+            data-action="increase"
+            data-id="${product.id}"
+          >
+            +
+          </button>
+
+          <span>
+            ${item.quantity}
+          </span>
+
+          <button
+            class="quantity-button"
+            data-action="decrease"
+            data-id="${product.id}"
+          >
+            −
+          </button>
+
         </div>
-      </section>
 
-      <section class="section" id="categories">
-        <div class="container">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">تصفّح بسهولة</p>
-              <h2>تسوّق حسب القسم</h2>
-            </div>
-          </div>
-
-          <div class="categories">
-            <button class="category-card active" data-filter="all">✨<strong>كل المنتجات</strong><small>جميع العروض</small></button>
-            <button class="category-card" data-filter="phones">📱<strong>الهواتف</strong><small>أجهزة ذكية</small></button>
-            <button class="category-card" data-filter="laptops">💻<strong>اللابتوبات</strong><small>عمل ودراسة</small></button>
-            <button class="category-card" data-filter="audio">🎧<strong>الصوتيات</strong><small>سماعات ومكبرات</small></button>
-          </div>
-        </div>
-      </section>
-
-      <section class="section products-section" id="products">
-        <div class="container">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">منتجات مختارة</p>
-              <h2>الأكثر طلبًا</h2>
-            </div>
-
-            <label class="search">
-              <span>⌕</span>
-              <input id="searchInput" type="search" placeholder="ابحث عن منتج..." />
-            </label>
-          </div>
-
-          <div class="products" id="productsGrid"></div>
-        </div>
-      </section>
-
-      <section class="trust">
-        <div class="container trust-grid">
-          <div>🔒<strong>دفع آمن</strong><span>بوابات دفع موثوقة</span></div>
-          <div>🚚<strong>توصيل سريع</strong><span>خدمة خلال 48 ساعة</span></div>
-          <div>💬<strong>دعم متواصل</strong><span>فريق جاهز للإجابة</span></div>
-          <div>↩️<strong>استرجاع سهل</strong><span>سياسة واضحة ومريحة</span></div>
-        </div>
-      </section>
-
-      <section class="section" id="articles">
-        <div class="container">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">محتوى تقني</p>
-              <h2>أحدث المقالات</h2>
-            </div>
-          </div>
-
-          <div class="articles">
-            <article>
-              <div class="article-art">📸</div>
-              <div>
-                <small>دليل شراء</small>
-                <h3>كيف تختار هاتفًا بكاميرا ممتازة؟</h3>
-                <p>تعرف على العوامل المهمة قبل شراء هاتف ذكي جديد، خاصة إن كنت تركز على جودة التصوير.</p>
-              </div>
-            </article>
-
-            <article>
-              <div class="article-art">💡</div>
-              <div>
-                <small>تجربة مستخدم</small>
-                <h3>أفضل لابتوب للعمل من المنزل</h3>
-                <p>مقارنة بين الأداء والراحة والبطارية والجودة عند اختيار جهاز مناسب لبيئة العمل.</p>
-              </div>
-            </article>
-
-            <article>
-              <div class="article-art">🎧</div>
-              <div>
-                <small>مراجعات</small>
-                <h3>ماذا تختار: سماعات لاسلكية أم سلكية؟</h3>
-                <p>نقارن بين الراحة، جودة الصوت، البطارية، وسهولة الاستخدام لتختار الأنسب لك.</p>
-              </div>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section class="section" id="contact">
-        <div class="container newsletter">
-          <div>
-            <p class="eyebrow">ابقَ على اطلاع</p>
-            <h2>اشترك في نشرتنا التقنية</h2>
-            <p>احصل على أحدث العروض، مراجعات المنتجات، وفيديوهات الاختبارات أولًا.</p>
-          </div>
-
-          <form id="subscribeForm">
-            <input type="email" placeholder="البريد الإلكتروني" aria-label="البريد الإلكتروني" required />
-            <button type="submit" class="primary-btn">اشتراك</button>
-          </form>
-        </div>
-      </section>
-    </main>
-
-    <aside class="cart-panel" id="cartPanel" aria-label="سلة التسوق">
-      <div class="cart-head">
-        <h2>سلة التسوق</h2>
-        <button id="closeCart" aria-label="إغلاق السلة">×</button>
       </div>
 
-      <div id="cartItems"></div>
+      <button
+        class="remove-button"
+        data-action="remove"
+        data-id="${product.id}"
+      >
+        حذف
+      </button>
 
-      <div class="cart-footer">
-        <div>
-          <span>الإجمالي</span>
-          <strong id="cartTotal">0 ر.س</strong>
-        </div>
-        <button id="checkout" class="primary-btn">إتمام الطلب</button>
-      </div>
-    </aside>
+    `;
 
-    <div id="overlay" aria-hidden="true"></div>
-    <div class="toast" id="toast"></div>
+    cartItems.appendChild(div);
+  });
 
-    <footer>
-      <div class="container footer-grid">
-        <div>
-          <a class="brand" href="#home">عالم <span>إلكترونيك</span></a>
-          <p>مشروع متجر إلكتروني عربي تجريبي، جاهز للتطوير والتسويق.</p>
-        </div>
+  cartTotal.textContent =
+    formatPrice(total);
 
-        <div>
-          <h3>روابط سريعة</h3>
-          <ul>
-            <li><a href="#products">المنتجات</a></li>
-            <li><a href="#categories">الأقسام</a></li>
-            <li><a href="#contact">التواصل</a></li>
-          </ul>
-        </div>
+  cartCount.textContent =
+    totalQuantity;
 
-        <div>
-          <h3>تواصل معنا</h3>
-          <ul>
-            <li>support@alamelectronic.com</li>
-            <li>+966 11 000 0000</li>
-            <li>الرياض — السعودية</li>
-          </ul>
-        </div>
-      </div>
-    </footer>
+  document
+    .querySelectorAll(".quantity-button, .remove-button")
+    .forEach(button => {
 
-    <script src="script.js"></script>
-  </body>
-</html>
+      button.addEventListener("click", () => {
+
+        const id =
+          Number(button.dataset.id);
+
+        const action =
+          button.dataset.action;
+
+        updateCart(id, action);
+
+      });
+
+    });
+}
+
+
+// ================================
+// تعديل السلة
+// ================================
+
+function updateCart(productId, action) {
+
+  const item =
+    cart.find(item => item.id === productId);
+
+  if (!item) return;
+
+  if (action === "increase") {
+    item.quantity++;
+  }
+
+  if (action === "decrease") {
+
+    item.quantity--;
+
+    if (item.quantity <= 0) {
+
+      cart =
+        cart.filter(item => item.id !== productId);
+    }
+  }
+
+  if (action === "remove") {
+
+    cart =
+      cart.filter(item => item.id !== productId);
+  }
+
+  saveCart();
+
+  renderCart();
+}
+
+
+// ================================
+// فتح السلة
+// ================================
+
+function openCart() {
+
+  cartPanel.classList.add("open");
+
+  overlay.classList.add("show");
+
+  document.body.classList.add("cart-open");
+}
+
+
+// ================================
+// إغلاق السلة
+// ================================
+
+function closeCart() {
+
+  cartPanel.classList.remove("open");
+
+  overlay.classList.remove("show");
+
+  document.body.classList.remove("cart-open");
+}
+
+
+// ================================
+// أحداث السلة
+// ================================
+
+document
+  .getElementById("openCart")
+  .addEventListener("click", openCart);
+
+document
+  .getElementById("closeCart")
+  .addEventListener("click", closeCart);
+
+overlay.addEventListener(
+  "click",
+  closeCart
+);
+
+
+// ================================
+// البحث
+// ================================
+
+searchInput.addEventListener(
+  "input",
+  renderProducts
+);
+
+
+// ================================
+// الأقسام
+// ================================
+
+document
+  .querySelectorAll(".category-card")
+  .forEach(button => {
+
+    button.addEventListener("click", () => {
+
+      document
+        .querySelectorAll(".category-card")
+        .forEach(item => {
+          item.classList.remove("active");
+        });
+
+      button.classList.add("active");
+
+      currentCategory =
+        button.dataset.category;
+
+      renderProducts();
+
+      document
+        .getElementById("products")
+        .scrollIntoView({
+          behavior: "smooth"
+        });
+    });
+
+  });
+
+
+// ================================
+// إتمام الطلب عبر واتساب
+// ================================
+
+checkout.addEventListener("click", () => {
+
+  if (cart.length === 0) return;
+
+  let message =
+    "السلام عليكم، أريد طلب المنتجات التالية:%0A%0A";
+
+  let total = 0;
+
+  cart.forEach(item => {
+
+    const product =
+      products.find(
+        product => product.id === item.id
+      );
+
+    if (!product) return;
+
+    const itemTotal =
+      product.price * item.quantity;
+
+    total += itemTotal;
+
+    message +=
+      `• ${product.name} × ${item.quantity} = ${formatPrice(itemTotal)}%0A`;
+  });
+
+  message +=
+    `%0Aالإجمالي: ${formatPrice(total)}`;
+
+  // استبدل الرقم برقم واتساب المتجر
+  const phone =
+    "213663029056";
+
+  window.open(
+    `https://wa.me/${phone}?text=${message}`,
+    "_blank"
+  );
+
+});
+
+
+// ================================
+// السنة الحالية
+// ================================
+
+document.getElementById("year").textContent =
+  new Date().getFullYear();
+
+
+// ================================
+// تشغيل الموقع
+// ================================
+
+renderProducts();
+
+renderCart();
