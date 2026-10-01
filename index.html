@@ -1,71 +1,664 @@
-<!doctype html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="عالم إلكترونيك - متجر عربي تجريبي للأجهزة والإكسسوارات" />
-  <title>عالم إلكترونيك | متجر التقنية</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <div class="announcement">🚚 شحن مجاني للطلبات فوق 500 ر.س — هذا متجر تجريبي</div>
-  <header class="header">
-    <div class="container nav">
-      <a class="brand" href="#home">عالم <span>إلكترونيك</span></a>
-      <button class="menu-toggle" id="menuToggle" aria-label="فتح القائمة">☰</button>
-      <nav id="navLinks">
-        <a href="#home">الرئيسية</a><a href="#categories">الأقسام</a><a href="#products">المنتجات</a><a href="#articles">المقالات</a><a href="#contact">تواصل</a>
-      </nav>
-      <button class="cart-button" id="cartButton" aria-label="فتح السلة">🛒 <span id="cartCount">0</span></button>
-    </div>
-  </header>
 
-  <main>
-   
-      <div class="container hero-grid">
-        <div>
-          <p class="eyebrow">تقنية أفضل، اختيار أذكى</p>
-          <h1>كل ما تحتاجه من عالم الإلكترونيات</h1>
-          <p class="hero-text">اكتشف أحدث الهواتف واللابتوبات والصوتيات والإكسسوارات في واجهة عربية سريعة وسهلة الاستخدام.</p>
-          <a class="primary-btn" href="#products">تسوّق الآن</a>
-          <a class="secondary-btn" href="#articles">اقرأ المراجعات</a>
-        </div>
-        <div class="hero-visual" aria-hidden="true"><span>📱</span><span>💻</span><span>🎧</span></div>
-      </div>
-    </section>
+:root {
+  --dark: #10182b;
+  --blue: #2563eb;
+  --blue-dark: #1d4ed8;
+  --light: #f5f7fb;
+  --white: #ffffff;
+  --text: #1e293b;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --success: #16a34a;
+  --danger: #dc2626;
+  --shadow: 0 14px 35px rgba(15, 23, 42, 0.10);
+}
 
-    <section class="section" id="categories">
-      <div class="container">
-        <div class="section-heading"><div><p class="eyebrow">تصفّح بسهولة</p><h2>تسوّق حسب القسم</h2></div></div>
-        <div class="categories">
-          <button class="category-card active" data-filter="all">✨<strong>كل المنتجات</strong><small>جميع العروض</small></button>
-          <button class="category-card" data-filter="phones">📱<strong>الهواتف</strong><small>أجهزة ذكية</small></button>
-          <button class="category-card" data-filter="laptops">💻<strong>اللابتوبات</strong><small>عمل ودراسة</small></button>
-          <button class="category-card" data-filter="audio">🎧<strong>الصوتيات</strong><small>سماعات ومكبرات</small></button>
-        </div>
-      </div>
-    </section>
+* {
+  box-sizing: border-box;
+}
 
-    <section class="section products-section" id="products">
-      <div class="container">
-        <div class="section-heading"><div><p class="eyebrow">منتجات مختارة</p><h2>الأكثر طلبًا</h2></div><label class="search"><span>⌕</span><input id="searchInput" type="search" placeholder="ابحث عن منتج..." /></label></div>
-        <div class="products" id="productsGrid"></div>
-      </div>
-    </section>
+html {
+  scroll-behavior: smooth;
+}
 
-    <section class="trust"><div class="container trust-grid"><div>🔒<strong>دفع آمن</strong><span>بوابات دفع موثوقة</span></div><div>🚚<strong>توصيل سريع</strong><span>متابعة سهلة لطلبك</span></div><div>💬<strong>دعم العملاء</strong><span>نجيب عن استفساراتك</span></div></div></section>
+body {
+  margin: 0;
+  background: var(--light);
+  color: var(--text);
+  font-family: Tahoma, Arial, sans-serif;
+}
 
-    <section class="section" id="articles">
-      <div class="container"><div class="section-heading"><div><p class="eyebrow">محتوى تقني</p><h2>أحدث المقالات</h2></div></div>
-      <div class="articles"><article><div class="article-art">📸</div><div><small>دليل شراء</small><h3>كيف تختار هاتفًا بكاميرا ممتازة؟</h3><p>تعرف على أهم مواصفات الكاميرا قبل اتخاذ قرار الشراء.</p><a href="#">اقرأ المزيد ←</a></div></article><article><div class="article-art">⚡</div><div><small>نصائح تقنية</small><h3>طرق بسيطة للحفاظ على بطارية الهاتف</h3><p>عادات عملية لتحسين عمر البطارية وأدائها اليومي.</p><a href="#">اقرأ المزيد ←</a></div></article><article><div class="article-art">🧠</div><div><small>لابتوبات</small><h3>مواصفات اللابتوب المناسب للدراسة</h3><p>دليل سريع للمعالج والذاكرة والتخزين والشاشة.</p><a href="#">اقرأ المزيد ←</a></div></article></div></div>
-    </section>
+body.cart-open {
+  overflow: hidden;
+}
 
-    <section class="section" id="contact"><div class="container newsletter"><div><p class="eyebrow">ابقَ على اطلاع</p><h2>اشترك في نشرتنا التقنية</h2><p>أحدث العروض والمراجعات تصل إلى بريدك.</p></div><form id="subscribeForm"><input type="email" required placeholder="بريدك الإلكتروني" aria-label="بريدك الإلكتروني"/><button class="primary-btn" type="submit">اشتراك</button></form></div></section>
-  </main>
-<script src="script.js"></script>
-  <aside class="cart-panel" id="cartPanel" aria-label="سلة التسوق"><div class="cart-head"><h2>سلة التسوق</h2><button id="closeCart" aria-label="إغلاق السلة">×</button></div><div id="cartItems"></div><div class="cart-footer"><p>الإجمالي: <strong id="cartTotal">0 ر.س</strong></p><button class="primary-btn" id="checkout">إتمام الطلب</button></div></aside><div class="overlay" id="overlay"></div>
+a {
+  color: inherit;
+  text-decoration: none;
+}
 
-  <footer><div class="container footer-grid"><div><a class="brand" href="#home">عالم <span>إلكترونيك</span></a><p>مشروع متجر إلكتروني عربي تجريبي، جاهز للتطوير والنشر.</p></div><div><h3>الأقسام</h3><a href="#products">الهواتف</a><a href="#products">اللابتوبات</a><a href="#products">الصوتيات</a></div><div><h3>معلومات</h3><a href="#">الشحن والتوصيل</a><a href="#">سياسة الاسترجاع</a><a href="#contact">اتصل بنا</a></div></div><p class="copyright">© 2026 عالم إلكترونيك — مشروع تجريبي</p></footer>
-  <div class="toast" id="toast"></div><script src="script.js"></script>
-</body>
-</html>
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: 0;
+}
+
+.container {
+  width: min(1120px, 92%);
+  margin: auto;
+}
+
+/* الإعلان */
+
+.announcement {
+  padding: 10px;
+  text-align: center;
+  color: white;
+  background: var(--dark);
+  font-size: 14px;
+}
+
+/* الرأس */
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(255, 255, 255, 0.96);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(10px);
+}
+
+.nav {
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.brand {
+  color: var(--dark);
+  font-size: 22px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.brand span {
+  color: var(--blue);
+}
+
+nav {
+  display: flex;
+  gap: 20px;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+nav a {
+  transition: 0.2s;
+}
+
+nav a:hover {
+  color: var(--blue);
+}
+
+.cart-button {
+  padding: 10px 14px;
+  color: white;
+  background: var(--blue);
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+.cart-button:hover {
+  background: var(--blue-dark);
+}
+
+/* Hero */
+
+.hero {
+  padding: 78px 0 58px;
+  color: white;
+  background:
+    radial-gradient(
+      circle at 80% 20%,
+      rgba(96, 165, 250, 0.34),
+      transparent 28%
+    ),
+    linear-gradient(135deg, #0f172a, #1d4ed8);
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  align-items: center;
+  gap: 40px;
+}
+
+.eyebrow {
+  margin: 0 0 12px;
+  color: #93c5fd;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+h1 {
+  margin: 0;
+  max-width: 620px;
+  font-size: clamp(32px, 5vw, 54px);
+  line-height: 1.25;
+}
+
+.hero-text {
+  max-width: 570px;
+  margin: 20px 0 28px;
+  color: #dbeafe;
+  line-height: 1.9;
+  font-size: 17px;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.primary-btn,
+.secondary-btn {
+  display: inline-block;
+  padding: 13px 20px;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+.primary-btn {
+  color: white;
+  background: var(--blue);
+}
+
+.primary-btn:hover {
+  background: var(--blue-dark);
+}
+
+.secondary-btn {
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.secondary-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.hero-icons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.hero-icon {
+  padding: 28px 16px;
+  text-align: center;
+  font-size: 52px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 22px;
+}
+
+/* الأقسام */
+
+.section {
+  padding: 65px 0;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 26px;
+}
+
+.section-heading .eyebrow {
+  color: var(--blue);
+}
+
+h2 {
+  margin: 0;
+  font-size: 29px;
+  color: var(--dark);
+}
+
+/* البحث */
+
+.search {
+  width: min(320px, 100%);
+  padding: 11px 14px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.search input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+}
+
+/* التصنيفات */
+
+.categories {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.category-card {
+  padding: 18px 12px;
+  color: var(--text);
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  transition: 0.2s;
+  text-align: center;
+}
+
+.category-card:hover,
+.category-card.active {
+  color: var(--blue);
+  border-color: var(--blue);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+}
+
+.category-card span {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 29px;
+}
+
+.category-card strong,
+.category-card small {
+  display: block;
+}
+
+.category-card small {
+  margin-top: 6px;
+  color: var(--muted);
+}
+
+/* المنتجات */
+
+.products {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.product-card {
+  overflow: hidden;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);
+  transition: 0.2s;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow);
+}
+
+.product-art {
+  height: 190px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #dbeafe, #eff6ff);
+  overflow: hidden;
+}
+
+.product-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 12px;
+}
+
+.product-emoji {
+  font-size: 70px;
+}
+
+.product-info {
+  padding: 17px;
+}
+
+.product-info small {
+  color: var(--blue);
+  font-weight: bold;
+}
+
+.product-info h3 {
+  min-height: 48px;
+  margin: 9px 0;
+  line-height: 1.5;
+  font-size: 17px;
+}
+
+.product-info p {
+  min-height: 42px;
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.product-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.price {
+  color: var(--dark);
+  font-weight: 800;
+}
+
+.add-button {
+  padding: 9px 11px;
+  color: white;
+  background: var(--dark);
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.add-button:hover {
+  background: var(--blue);
+}
+
+.no-results {
+  display: none;
+  padding: 40px;
+  text-align: center;
+  color: var(--muted);
+}
+
+/* المميزات */
+
+.features {
+  padding: 42px 0;
+  color: white;
+  background: var(--dark);
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  text-align: center;
+}
+
+.feature {
+  padding: 10px;
+}
+
+.feature span {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 32px;
+}
+
+.feature h3 {
+  margin: 8px 0;
+}
+
+.feature p {
+  margin: 7px 0 0;
+  color: #cbd5e1;
+  font-size: 14px;
+}
+
+/* التواصل */
+
+.contact-box {
+  padding: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+}
+
+.contact-box p:not(.eyebrow) {
+  color: var(--muted);
+}
+
+.whatsapp-btn {
+  padding: 13px 20px;
+  color: white;
+  background: #16a34a;
+  border-radius: 10px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.whatsapp-btn:hover {
+  background: #15803d;
+}
+
+/* السلة */
+
+.cart-panel {
+  position: fixed;
+  z-index: 50;
+  top: 0;
+  left: -420px;
+  width: min(400px, 92vw);
+  height: 100vh;
+  padding: 22px;
+  overflow-y: auto;
+  background: white;
+  box-shadow: 8px 0 30px rgba(15, 23, 42, 0.22);
+  transition: 0.3s;
+}
+
+.cart-panel.open {
+  left: 0;
+}
+
+.cart-head,
+.cart-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.close-cart {
+  width: 35px;
+  height: 35px;
+  color: var(--dark);
+  background: #e2e8f0;
+  border-radius: 50%;
+  font-size: 21px;
+}
+
+.cart-item {
+  padding: 13px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.cart-item-info {
+  flex: 1;
+}
+
+.cart-item strong,
+.cart-item small {
+  display: block;
+}
+
+.cart-item small {
+  margin-top: 4px;
+  color: var(--muted);
+}
+
+.cart-quantity {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 8px;
+}
+
+.quantity-button {
+  width: 27px;
+  height: 27px;
+  border-radius: 6px;
+  background: #e2e8f0;
+}
+
+.remove-button {
+  padding: 7px 9px;
+  color: var(--danger);
+  background: #fee2e2;
+  border-radius: 7px;
+}
+
+.empty-cart {
+  padding: 35px 0;
+  text-align: center;
+  color: var(--muted);
+}
+
+.cart-total {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 2px solid var(--border);
+  font-size: 18px;
+}
+
+.checkout {
+  width: 100%;
+  margin-top: 18px;
+  padding: 13px;
+  color: white;
+  background: var(--success);
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+.checkout:hover {
+  background: #15803d;
+}
+
+.overlay {
+  position: fixed;
+  z-index: 40;
+  inset: 0;
+  display: none;
+  background: rgba(15, 23, 42, 0.5);
+}
+
+.overlay.show {
+  display: block;
+}
+
+/* التذييل */
+
+footer {
+  padding: 28px 0;
+  text-align: center;
+  color: #94a3b8;
+  background: #0b1120;
+}
+
+footer p {
+  margin-bottom: 0;
+}
+
+/* الجوال */
+
+@media (max-width: 850px) {
+
+  nav {
+    display: none;
+  }
+
+  .hero-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-grid > div:first-child {
+    grid-column: 1;
+  }
+
+  .products {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .categories {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .features-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+
+  .nav {
+    min-height: 62px;
+  }
+
+  .brand {
+    font-size: 18px;
+  }
+
+  .hero {
+    padding-top: 50px;
+  }
+
+  .hero-icons {
+    display: none;
+  }
+
+  .section-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .products,
+  .categories,
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .product-art {
+    height: 180px;
+  }
+
+  .contact-box {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 25px;
+  }
+
+  .whatsapp-btn {
+    text-align: center;
+  }
+}
