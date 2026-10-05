@@ -1,609 +1,241 @@
 
-// ================================
-// عالم إلكترونيك - JavaScript
-// ================================
-
 const products = [
   {
     id: 1,
-    name: "Galaxy S26 Ultra",
+    name: "هاتف Galaxy S26 Ultra",
     category: "phones",
-    categoryName: "هواتف",
-    price: 499900,
-    description: "هاتف قوي بكاميرا متقدمة وشاشة عالية الدقة.",
-    image: "https://d2u1z1lopyfwlx.cloudfront.net/thumbnails/1279fb2a-1c4b-5ca4-ac0d-9f370abd5b24/4cbaa4b4-65d2-5a5f-bfb2-2f048ee18613.jpg"
+    icon: "📱",
+    price: 249999,
+    description: "هاتف قوي بكاميرا متقدمة وشاشة عالية الدقة."
   },
   {
     id: 2,
-    name: "iPhone 17 Pro Max",
-    category: "phones",
-    categoryName: "هواتف",
-    price: 549900,
-    description: "هاتف متطور بأداء قوي وتجربة تصوير مميزة.",
-    emoji: "📱"
+    name: "لابتوب للعمل والدراسة",
+    category: "laptops",
+    icon: "💻",
+    price: 119999,
+    description: "أداء ممتاز وبطارية مناسبة للعمل والدراسة."
   },
   {
     id: 3,
-    name: "Redmi Note",
-    category: "phones",
-    categoryName: "هواتف",
-    price: 89900,
-    description: "هاتف عملي مناسب للاستخدام اليومي.",
-    emoji: "📱"
+    name: "سماعات لاسلكية",
+    category: "audio",
+    icon: "🎧",
+    price: 8999,
+    description: "صوت نقي وبطارية تدوم طوال اليوم."
   },
   {
     id: 4,
-    name: "لابتوب للعمل والدراسة",
-    category: "laptops",
-    categoryName: "لابتوبات",
-    price: 329900,
-    description: "أداء ممتاز وبطارية مناسبة للعمل والدراسة.",
-    emoji: "💻"
+    name: "شاحن سريع USB-C",
+    category: "accessories",
+    icon: "🔌",
+    price: 3499,
+    description: "شاحن سريع للهواتف والأجهزة الحديثة."
   },
   {
     id: 5,
-    name: "MacBook",
-    category: "laptops",
-    categoryName: "لابتوبات",
-    price: 499900,
-    description: "لابتوب أنيق للأعمال والإبداع والدراسة.",
-    emoji: "💻"
-  },
-  {
-    id: 6,
-    name: "سماعات لاسلكية",
-    category: "audio",
-    categoryName: "صوتيات",
-    price: 39900,
-    description: "صوت نقي وبطارية تدوم طوال اليوم.",
-    emoji: "🎧"
-  },
-  {
-    id: 7,
-    name: "سماعة Bluetooth",
-    category: "audio",
-    categoryName: "صوتيات",
-    price: 24900,
-    description: "سماعة محمولة بصوت واضح وتصميم عملي.",
-    emoji: "🔊"
-  },
-  {
-    id: 8,
-    name: "شاحن سريع USB-C",
-    category: "accessories",
-    categoryName: "إكسسوارات",
-    price: 7500,
-    description: "شاحن سريع للأجهزة الحديثة.",
-    emoji: "🔌"
-  },
-  {
-    id: 9,
-    name: "كابل USB-C",
-    category: "accessories",
-    categoryName: "إكسسوارات",
-    price: 2500,
-    description: "كابل عملي للشحن ونقل البيانات.",
-    emoji: "🔗"
-  },
-  {
-    id: 10,
-    name: "ساعة ذكية",
+    name: "ساعة ذكية رياضية",
     category: "watches",
-    categoryName: "ساعات",
-    price: 45900,
-    description: "ساعة ذكية لمتابعة الإشعارات والنشاط اليومي.",
-    emoji: "⌚"
+    icon: "⌚",
+    price: 12999,
+    description: "ساعة ذكية لمتابعة النشاط اليومي."
   }
 ];
 
-let cart = JSON.parse(localStorage.getItem("alamElectronicCart")) || [];
+let selectedCategory = "all";
+let cart = [];
 
-let currentCategory = "all";
+const productsContainer = document.getElementById("productsContainer");
+const noResults = document.getElementById("noResults");
+const searchInput = document.getElementById("searchInput");
+const cartCount = document.getElementById("cartCount");
+const cartItems = document.getElementById("cartItems");
+const emptyCart = document.getElementById("emptyCart");
+const cartTotal = document.getElementById("cartTotal");
 
-const productsContainer =
-  document.getElementById("productsContainer");
-
-const searchInput =
-  document.getElementById("searchInput");
-
-const noResults =
-  document.getElementById("noResults");
-
-const cartPanel =
-  document.getElementById("cartPanel");
-
-const overlay =
-  document.getElementById("overlay");
-
-const cartItems =
-  document.getElementById("cartItems");
-
-const cartCount =
-  document.getElementById("cartCount");
-
-const cartTotal =
-  document.getElementById("cartTotal");
-
-const emptyCart =
-  document.getElementById("emptyCart");
-
-const checkout =
-  document.getElementById("checkout");
-
-
-// ================================
-// تنسيق السعر
-// ================================
+const cartPanel = document.getElementById("cartPanel");
+const overlay = document.getElementById("overlay");
 
 function formatPrice(price) {
-  return new Intl.NumberFormat("ar-DZ").format(price) + " دج";
+  return price.toLocaleString("fr-FR") + " دج";
 }
 
+function categoryName(category) {
+  const names = {
+    phones: "هواتف",
+    laptops: "لابتوبات",
+    audio: "صوتيات",
+    accessories: "إكسسوارات",
+    watches: "ساعات"
+  };
 
-// ================================
-// عرض المنتجات
-// ================================
+  return names[category] || "منتجات";
+}
 
 function renderProducts() {
+  const query = searchInput.value.trim().toLowerCase();
 
-  const searchValue =
-    searchInput.value.trim().toLowerCase();
+  const filteredProducts = products.filter((product) => {
+    const categoryMatch =
+      selectedCategory === "all" ||
+      product.category === selectedCategory;
 
-  const filteredProducts = products.filter(product => {
+    const searchMatch =
+      query === "" ||
+      product.name.toLowerCase().includes(query) ||
+      product.description.toLowerCase().includes(query);
 
-    const matchesCategory =
-      currentCategory === "all" ||
-      product.category === currentCategory;
-
-    const matchesSearch =
-      product.name.toLowerCase().includes(searchValue) ||
-      product.description.toLowerCase().includes(searchValue) ||
-      product.categoryName.toLowerCase().includes(searchValue);
-
-    return matchesCategory && matchesSearch;
+    return categoryMatch && searchMatch;
   });
 
   productsContainer.innerHTML = "";
 
-  if (filteredProducts.length === 0) {
-    noResults.style.display = "block";
-    return;
-  }
+  noResults.style.display =
+    filteredProducts.length === 0 ? "block" : "none";
 
-  noResults.style.display = "none";
-
-  filteredProducts.forEach(product => {
-
+  filteredProducts.forEach((product) => {
     const card = document.createElement("article");
 
     card.className = "product-card";
 
-    let productImage = "";
-
-    if (product.image) {
-
-      productImage = `
-        <img
-          src="${product.image}"
-          alt="${product.name}"
-          loading="lazy"
-        >
-      `;
-
-    } else {
-
-      productImage = `
-        <span class="product-emoji">
-          ${product.emoji}
-        </span>
-      `;
-    }
-
     card.innerHTML = `
-      <div class="product-art">
-        ${productImage}
-      </div>
+      <div class="product-art">${product.icon}</div>
 
       <div class="product-info">
-
-        <small>${product.categoryName}</small>
-
+        <small>${categoryName(product.category)}</small>
         <h3>${product.name}</h3>
-
         <p>${product.description}</p>
 
         <div class="product-bottom">
-
-          <span class="price">
-            ${formatPrice(product.price)}
-          </span>
-
-          <button
-            class="add-button"
-            data-id="${product.id}"
-          >
+          <span class="price">${formatPrice(product.price)}</span>
+          <button class="add-button" data-id="${product.id}">
             أضف للسلة
           </button>
-
         </div>
-
       </div>
     `;
 
     productsContainer.appendChild(card);
   });
 
-  document.querySelectorAll(".add-button").forEach(button => {
-
+  document.querySelectorAll(".add-button").forEach((button) => {
     button.addEventListener("click", () => {
-
-      const id = Number(button.dataset.id);
-
-      addToCart(id);
-
+      addToCart(Number(button.dataset.id));
     });
-
   });
 }
 
-
-// ================================
-// إضافة منتج للسلة
-// ================================
-
 function addToCart(productId) {
+  const product = products.find((item) => item.id === productId);
 
-  const existingItem =
-    cart.find(item => item.id === productId);
+  if (!product) {
+    return;
+  }
 
-  if (existingItem) {
+  const existingProduct = cart.find((item) => item.id === productId);
 
-    existingItem.quantity += 1;
-
+  if (existingProduct) {
+    existingProduct.quantity += 1;
   } else {
-
     cart.push({
-      id: productId,
+      ...product,
       quantity: 1
     });
   }
 
-  saveCart();
-
   renderCart();
-
-  openCart();
-
+  openCartPanel();
 }
-
-
-// ================================
-// حفظ السلة
-// ================================
-
-function saveCart() {
-
-  localStorage.setItem(
-    "alamElectronicCart",
-    JSON.stringify(cart)
-  );
-}
-
-
-// ================================
-// عرض السلة
-// ================================
 
 function renderCart() {
+  const totalItems = cart.reduce(
+    (sum, item) => sum + item.quantity,
+    0
+  );
+
+  const totalPrice = cart.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+
+  cartCount.textContent = totalItems;
+  cartTotal.textContent = formatPrice(totalPrice);
 
   cartItems.innerHTML = "";
 
-  let total = 0;
+  emptyCart.style.display =
+    cart.length === 0 ? "block" : "none";
 
-  let totalQuantity = 0;
+  cart.forEach((item) => {
+    const row = document.createElement("div");
 
+    row.className = "cart-item";
+
+    row.innerHTML = `
+      <div>
+        <strong>${item.icon} ${item.name}</strong>
+        <small>${item.quantity} × ${formatPrice(item.price)}</small>
+      </div>
+
+      <button class="remove-button" data-id="${item.id}">
+        حذف
+      </button>
+    `;
+
+    cartItems.appendChild(row);
+  });
+
+  document.querySelectorAll(".remove-button").forEach((button) => {
+    button.addEventListener("click", () => {
+      const productId = Number(button.dataset.id);
+
+      cart = cart.filter((item) => item.id !== productId);
+
+      renderCart();
+    });
+  });
+}
+
+function openCartPanel() {
+  cartPanel.classList.add("open");
+  overlay.classList.add("show");
+}
+
+function closeCartPanel() {
+  cartPanel.classList.remove("open");
+  overlay.classList.remove("show");
+}
+
+document.querySelectorAll(".category-card").forEach((button) => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll(".category-card").forEach((card) => {
+      card.classList.remove("active");
+    });
+
+    button.classList.add("active");
+    selectedCategory = button.dataset.category;
+
+    renderProducts();
+  });
+});
+
+searchInput.addEventListener("input", renderProducts);
+
+document.getElementById("openCart").addEventListener("click", openCartPanel);
+document.getElementById("closeCart").addEventListener("click", closeCartPanel);
+overlay.addEventListener("click", closeCartPanel);
+
+document.getElementById("checkout").addEventListener("click", () => {
   if (cart.length === 0) {
-
-    emptyCart.style.display = "block";
-
-    cartTotal.textContent = "0 دج";
-
-    cartCount.textContent = "0";
-
-    checkout.disabled = true;
-
-    checkout.style.opacity = "0.5";
-
+    alert("السلة فارغة. أضف منتجًا أولًا.");
     return;
   }
 
-  emptyCart.style.display = "none";
-
-  checkout.disabled = false;
-
-  checkout.style.opacity = "1";
-
-  cart.forEach(item => {
-
-    const product =
-      products.find(product => product.id === item.id);
-
-    if (!product) return;
-
-    const itemTotal =
-      product.price * item.quantity;
-
-    total += itemTotal;
-
-    totalQuantity += item.quantity;
-
-    const div =
-      document.createElement("div");
-
-    div.className = "cart-item";
-
-    div.innerHTML = `
-
-      <div class="cart-item-info">
-
-        <strong>
-          ${product.name}
-        </strong>
-
-        <small>
-          ${formatPrice(product.price)}
-        </small>
-
-        <div class="cart-quantity">
-
-          <button
-            class="quantity-button"
-            data-action="increase"
-            data-id="${product.id}"
-          >
-            +
-          </button>
-
-          <span>
-            ${item.quantity}
-          </span>
-
-          <button
-            class="quantity-button"
-            data-action="decrease"
-            data-id="${product.id}"
-          >
-            −
-          </button>
-
-        </div>
-
-      </div>
-
-      <button
-        class="remove-button"
-        data-action="remove"
-        data-id="${product.id}"
-      >
-        حذف
-      </button>
-
-    `;
-
-    cartItems.appendChild(div);
-  });
-
-  cartTotal.textContent =
-    formatPrice(total);
-
-  cartCount.textContent =
-    totalQuantity;
-
-  document
-    .querySelectorAll(".quantity-button, .remove-button")
-    .forEach(button => {
-
-      button.addEventListener("click", () => {
-
-        const id =
-          Number(button.dataset.id);
-
-        const action =
-          button.dataset.action;
-
-        updateCart(id, action);
-
-      });
-
-    });
-}
-
-
-// ================================
-// تعديل السلة
-// ================================
-
-function updateCart(productId, action) {
-
-  const item =
-    cart.find(item => item.id === productId);
-
-  if (!item) return;
-
-  if (action === "increase") {
-    item.quantity++;
-  }
-
-  if (action === "decrease") {
-
-    item.quantity--;
-
-    if (item.quantity <= 0) {
-
-      cart =
-        cart.filter(item => item.id !== productId);
-    }
-  }
-
-  if (action === "remove") {
-
-    cart =
-      cart.filter(item => item.id !== productId);
-  }
-
-  saveCart();
-
-  renderCart();
-}
-
-
-// ================================
-// فتح السلة
-// ================================
-
-function openCart() {
-
-  cartPanel.classList.add("open");
-
-  overlay.classList.add("show");
-
-  document.body.classList.add("cart-open");
-}
-
-
-// ================================
-// إغلاق السلة
-// ================================
-
-function closeCart() {
-
-  cartPanel.classList.remove("open");
-
-  overlay.classList.remove("show");
-
-  document.body.classList.remove("cart-open");
-}
-
-
-// ================================
-// أحداث السلة
-// ================================
-
-document
-  .getElementById("openCart")
-  .addEventListener("click", openCart);
-
-document
-  .getElementById("closeCart")
-  .addEventListener("click", closeCart);
-
-overlay.addEventListener(
-  "click",
-  closeCart
-);
-
-
-// ================================
-// البحث
-// ================================
-
-searchInput.addEventListener(
-  "input",
-  renderProducts
-);
-
-
-// ================================
-// الأقسام
-// ================================
-
-document
-  .querySelectorAll(".category-card")
-  .forEach(button => {
-
-    button.addEventListener("click", () => {
-
-      document
-        .querySelectorAll(".category-card")
-        .forEach(item => {
-          item.classList.remove("active");
-        });
-
-      button.classList.add("active");
-
-      currentCategory =
-        button.dataset.category;
-
-      renderProducts();
-
-      document
-        .getElementById("products")
-        .scrollIntoView({
-          behavior: "smooth"
-        });
-    });
-
-  });
-
-
-// ================================
-// إتمام الطلب عبر واتساب
-// ================================
-
-checkout.addEventListener("click", () => {
-
-  if (cart.length === 0) return;
-
-  let message =
-    "السلام عليكم، أريد طلب المنتجات التالية:%0A%0A";
-
-  let total = 0;
-
-  cart.forEach(item => {
-
-    const product =
-      products.find(
-        product => product.id === item.id
-      );
-
-    if (!product) return;
-
-    const itemTotal =
-      product.price * item.quantity;
-
-    total += itemTotal;
-
-    message +=
-      `• ${product.name} × ${item.quantity} = ${formatPrice(itemTotal)}%0A`;
-  });
-
-  message +=
-    `%0Aالإجمالي: ${formatPrice(total)}`;
-
-  // استبدل الرقم برقم واتساب المتجر
-  const phone =
-    "213663029056";
-
-  window.open(
-    `https://wa.me/${phone}?text=${message}`,
-    "_blank"
-  );
-
+  alert("أضف رقم واتساب الحقيقي في الكود لإتمام الطلب.");
 });
-
-
-// ================================
-// السنة الحالية
-// ================================
 
 document.getElementById("year").textContent =
   new Date().getFullYear();
 
-
-// ================================
-// تشغيل الموقع
-// ================================
-
 renderProducts();
-
 renderCart();
